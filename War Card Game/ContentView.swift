@@ -11,12 +11,12 @@ struct ContentView: View {
     @EnvironmentObject var gameManager: GameManager
     
     var body: some View {
-        if !gameManager.showGame && gameManager.winner == "" {
+        if !gameManager.showGame && gameManager.winner == nil {
             HomeView()
-        } else if gameManager.showGame && gameManager.winner == "" {
+        } else if gameManager.showGame && gameManager.winner == nil {
             GameView()
-        } else if !gameManager.showGame && gameManager.winner != "" {
-            VictoryView()
+        } else if gameManager.winner != nil {
+            GameEndView()
         }
     }
 }

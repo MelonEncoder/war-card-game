@@ -25,21 +25,19 @@ struct GameView: View {
                         Text("CPU")
                             .font(.largeTitle)
                             .padding(.bottom, 10.0)
-                        HStack {
+                        VStack {
                             Text("score: \(gameManager.cpuScore)")
-                                .font(.title)
+                            Text("war wins: \(gameManager.cpuWarWins)")
+                            Text("cards: \(gameManager.cpuDeck.count + gameManager.cpuHand.count)")
                         }
-                        HStack {
-                            Text("cards: \(gameManager.cpuDeck.count)")
-                                .font(.title)
-                        }
+                        .font(.title)
                     }
                 }
                 .foregroundColor(.white)
                 .padding(40)
                 Spacer()
                 HStack {
-                    if (gameManager.isPlaying) {
+                    if (gameManager.hasFlipped) {
                         Image(gameManager.cpuCard.getRank())
                         Spacer()
                         Spacer()
@@ -53,14 +51,12 @@ struct GameView: View {
                         Text("Player")
                             .font(.largeTitle)
                             .padding(.bottom, 10.0)
-                        HStack {
+                        VStack {
                             Text("score: \(gameManager.playerScore)")
-                                .font(.title)
+                            Text("war wins: \(gameManager.playerWarWins)")
+                            Text("cards: \(gameManager.playerDeck.count + gameManager.playerHand.count)")
                         }
-                        HStack {
-                            Text("cards: \(gameManager.playerDeck.count)")
-                                .font(.title)
-                        }
+                        .font(.title)
                     }
                     Spacer()
                     CardStackView()
@@ -71,13 +67,11 @@ struct GameView: View {
             .padding()
         }
         .onTapGesture(count: 1, perform: {
-            if (!gameManager.isPlaying) {
-                gameManager.isPlaying = true
-            }
             gameManager.flip()
+            if (!gameManager.hasFlipped) {
+                gameManager.hasFlipped = true
+            }
             gameManager.checkWin()
-            print(gameManager.playerCard.getRank())
-            print(gameManager.cpuCard.getRank())
         })
     }
 }
