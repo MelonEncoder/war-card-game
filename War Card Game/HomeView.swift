@@ -30,9 +30,11 @@ struct HomeView: View {
     }
     func play() {
         gameManager.showGame = true
+        gameManager.dealHands()
     }
 }
 
 #Preview {
     HomeView()
+        .environmentObject(GameManager())
 }

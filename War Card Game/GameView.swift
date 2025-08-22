@@ -17,15 +17,22 @@ struct GameView: View {
                 .ignoresSafeArea()
             VStack(alignment: .center) {
                 HStack {
-                    Image("back")
+                    CardStackView()
                     Spacer()
                     Spacer()
+                    
                     VStack {
                         Text("CPU")
-                            .font(.headline)
-                            .padding(.bottom, 10.0)
-                        Text("\(gameManager.cpuScore)")
                             .font(.largeTitle)
+                            .padding(.bottom, 10.0)
+                        HStack {
+                            Text("score: \(gameManager.cpuScore)")
+                                .font(.title)
+                        }
+                        HStack {
+                            Text("cards: \(gameManager.cpuDeck.count)")
+                                .font(.title)
+                        }
                     }
                 }
                 .foregroundColor(.white)
@@ -33,10 +40,10 @@ struct GameView: View {
                 Spacer()
                 HStack {
                     if (gameManager.isPlaying) {
-                        Image(gameManager.cpuCard)
+                        Image(gameManager.cpuCard.getRank())
                         Spacer()
                         Spacer()
-                        Image(gameManager.playerCard)
+                        Image(gameManager.playerCard.getRank())
                     }
                 }
                 .padding(40)
@@ -44,13 +51,19 @@ struct GameView: View {
                 HStack {
                     VStack {
                         Text("Player")
-                            .font(.headline)
-                            .padding(.bottom, 10.0)
-                        Text("\(gameManager.playerScore)")
                             .font(.largeTitle)
+                            .padding(.bottom, 10.0)
+                        HStack {
+                            Text("score: \(gameManager.playerScore)")
+                                .font(.title)
+                        }
+                        HStack {
+                            Text("cards: \(gameManager.playerDeck.count)")
+                                .font(.title)
+                        }
                     }
                     Spacer()
-                    Image("back")
+                    CardStackView()
                 }
                 .foregroundColor(.white)
                 .padding(40)
@@ -61,11 +74,29 @@ struct GameView: View {
             if (!gameManager.isPlaying) {
                 gameManager.isPlaying = true
             }
-            gameManager.deal()
+            gameManager.flip()
+            gameManager.checkWin()
+            print(gameManager.playerCard.getRank())
+            print(gameManager.cpuCard.getRank())
         })
+    }
+}
+
+struct CardStackView: View {
+    var body: some View {
+        ZStack {
+            Image("back")
+            Image("back")
+                .padding(.bottom, 5)
+            Image("back")
+                .padding(.bottom, 10)
+            Image("back")
+                .padding(.bottom, 15)
+        }
     }
 }
 
 #Preview {
     GameView()
+        .environmentObject(GameManager())
 }
