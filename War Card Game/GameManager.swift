@@ -23,19 +23,25 @@ class GameManager: ObservableObject {
     @Published var cpuCaptureDeck: [Card] = []
     @Published var winner: String? = nil
     
-    // Precondition of flip function is that both the player and cpu have cards
     func flip() {
-        print("Total Cards in Play: ", playerHand.count + cpuHand.count)
-        
-        if playerHand.isEmpty {
-            playerHand = shuffle(deck: &playerDeck)
+        if playerHand.isEmpty && !playerDeck.isEmpty {
+            playerHand = shuffle(deck: playerDeck)
+            playerDeck = []
+            print("player shuffle")
         }
-        if cpuHand.isEmpty {
-            cpuHand = shuffle(deck: &cpuDeck)
+        if cpuHand.isEmpty && !cpuDeck.isEmpty {
+            cpuHand = shuffle(deck: cpuDeck)
+            cpuDeck = []
+            print("cpu shuffle")
         }
         
-        playerCard = playerHand.remove(at: 0)
-        cpuCard = cpuHand.remove(at: 0)
+        if !playerHand.isEmpty {
+            playerCard = playerHand.remove(at: 0)
+        }
+        if !cpuHand.isEmpty {
+            cpuCard = cpuHand.remove(at: 0)
+        }
+
 
         if playerCard.value() > cpuCard.value() {
             playerScore += 1
@@ -58,17 +64,12 @@ class GameManager: ObservableObject {
                 cpuDeck.append(playerCard)
             }
         } else if playerCard.value() == cpuCard.value() { // WAR
-            if playerDeck.isEmpty && cpuDeck.isEmpty {
-                winner = "draw"
-            } else if playerDeck.isEmpty {
-                winner = "computer"
-            } else if cpuDeck.isEmpty {
-                winner = "player"
-            } else {
-                war()
-            }
+            war()
         }
         
+        print("CPU: H \(cpuHand.count), D \(cpuDeck.count)")
+        print("Player: H \(playerHand.count), D \(playerDeck.count)")
+
         func war(playerTempDeck: [Card] = [], cpuTempDeck: [Card] = []) {
             print("WAR")
             
@@ -77,10 +78,12 @@ class GameManager: ObservableObject {
             
             for _ in 1...4 {
                 if playerHand.isEmpty && !playerDeck.isEmpty {
-                    playerHand = shuffle(deck: &playerDeck)
+                    playerHand = shuffle(deck: playerDeck)
+                    playerDeck = []
                 }
                 if cpuHand.isEmpty && !cpuDeck.isEmpty {
-                    cpuHand = shuffle(deck: &cpuDeck)
+                    cpuHand = shuffle(deck: cpuDeck)
+                    cpuDeck = []
                 }
                 if !playerHand.isEmpty {
                     playerTD.append(playerHand.remove(at: 0))
@@ -135,42 +138,24 @@ class GameManager: ObservableObject {
         }
     }
     
-    func shuffle(deck: inout [Card]) -> [Card] {
-        var hand: [Card] = []
-        for _ in 0..<deck.count {
-            if let index = deck.indices.randomElement() {
-                hand.append(deck.remove(at: index))
+    func shuffle(deck: [Card]) -> [Card] {
+        var tempDeck: [Card] = deck
+        var shuffledDeck: [Card] = []
+        let size: Int = tempDeck.count
+        for _ in 1...size {
+            if let index = tempDeck.indices.randomElement() {
+                shuffledDeck.append(tempDeck.remove(at: index))
             }
         }
-        return hand
-    }
-    
-    func reset() {
-        showGame = false
-        hasFlipped = false
-        playerScore = 0
-        playerWarWins = 0
-        playerCard = nil
-        playerDeck = []
-        cpuScore = 0
-        cpuWarWins = 0
-        cpuCard = nil
-        cpuDeck = []
-        winner = nil
-    }
-    
-    func restart() {
-        reset()
-        showGame = true
-        dealHands()
+        return shuffledDeck
     }
     
     func checkWin() {
-        if playerHand.isEmpty && playerDeck.isEmpty && cpuHand.isEmpty && cpuDeck.isEmpty {
-            winner = "draw"
-        } else if playerHand.isEmpty && playerDeck.isEmpty {
+        let playerCount = playerHand.count + playerDeck.count
+        let cpuCount = cpuHand.count + cpuDeck.count
+        if playerCount == 0 {
             winner = "computer"
-        } else if cpuDeck.isEmpty && cpuHand.isEmpty {
+        } else if cpuCount == 0 {
             winner = "player"
         }
     }
@@ -188,7 +173,29 @@ class GameManager: ObservableObject {
                 cpuHand.append(deck[index])
             }
         }
-        print(playerDeck.count, cpuDeck.count)
+        print(playerHand.count, cpuHand.count)
+    }
+    
+    func reset() {
+        showGame = false
+        hasFlipped = false
+        playerScore = 0
+        playerWarWins = 0
+        playerCard = nil
+        playerHand = []
+        playerDeck = []
+        cpuScore = 0
+        cpuWarWins = 0
+        cpuCard = nil
+        cpuHand = []
+        cpuDeck = []
+        winner = nil
+    }
+    
+    func restart() {
+        reset()
+        showGame = true
+        dealHands()
     }
 }
  
